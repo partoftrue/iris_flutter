@@ -1,111 +1,122 @@
 import 'package:flutter/material.dart';
 import 'package:iris/theme/app_theme.dart';
+import 'package:iris/screens/work_screen.dart';
+import 'package:iris/screens/schedule_screen.dart';
+import 'package:iris/screens/records_screen.dart';
 
 class AllScreen extends StatelessWidget {
   const AllScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        title: const Text('전체'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileSection(),
-            _buildQuickActions(),
-            _buildSettingsSection(),
-          ],
-        ),
-      ),
-    );
-  }
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
-  Widget _buildProfileSection() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      color: AppTheme.surfaceColor,
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-            child: const Icon(
-              Icons.person_outline,
-              size: 30,
-              color: AppTheme.primaryColor,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '홍길동',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '직원',
-                  style: TextStyle(
-                    color: AppTheme.secondaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return Scaffold(
+      backgroundColor: colorScheme.background,
+      appBar: AppBar(
+        title: Text('메뉴', style: textTheme.headlineLarge),
+        centerTitle: true,
+        actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: colorScheme.onBackground,
+            ),
             onPressed: () {
-              // TODO: Implement profile edit
+              // TODO: Show notifications
             },
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildQuickActions() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          const Text(
-            '빠른 실행',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildQuickActionItem(
-                Icons.add_circle_outline,
-                '일정 추가',
+          _buildSection(
+            context,
+            '근무',
+            [
+              _buildMenuItem(
+                context,
+                '근무 일정',
+                '근무 일정을 확인하고 관리해요',
+                Icons.calendar_today_outlined,
+                Icons.arrow_forward_ios,
                 () {
-                  // TODO: Implement quick schedule add
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const WorkScreen()),
+                  );
                 },
               ),
-              _buildQuickActionItem(
-                Icons.note_add_outlined,
-                '기록 추가',
-                () {
-                  // TODO: Implement quick record add
-                },
-              ),
-              _buildQuickActionItem(
-                Icons.work_outline,
+              _buildMenuItem(
+                context,
                 '근무 신청',
+                '추가 근무를 신청해요',
+                Icons.add_circle_outline,
+                Icons.arrow_forward_ios,
                 () {
-                  // TODO: Implement quick work request
+                  // TODO: Navigate to work request form
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildSection(
+            context,
+            '일정',
+            [
+              _buildMenuItem(
+                context,
+                '일정 목록',
+                '전체 일정을 확인해요',
+                Icons.event_outlined,
+                Icons.arrow_forward_ios,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ScheduleScreen()),
+                  );
+                },
+              ),
+              _buildMenuItem(
+                context,
+                '일정 추가',
+                '새로운 일정을 추가해요',
+                Icons.add_circle_outline,
+                Icons.arrow_forward_ios,
+                () {
+                  // TODO: Show add schedule dialog
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildSection(
+            context,
+            '기록',
+            [
+              _buildMenuItem(
+                context,
+                '기록 목록',
+                '전체 기록을 확인해요',
+                Icons.description_outlined,
+                Icons.arrow_forward_ios,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RecordsScreen()),
+                  );
+                },
+              ),
+              _buildMenuItem(
+                context,
+                '기록 추가',
+                '새로운 기록을 추가해요',
+                Icons.add_circle_outline,
+                Icons.arrow_forward_ios,
+                () {
+                  // TODO: Show add record dialog
                 },
               ),
             ],
@@ -115,121 +126,106 @@ class AllScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionItem(
-    IconData icon,
-    String label,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: AppTheme.primaryColor,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSettingsSection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '설정',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: Column(
-              children: [
-                _buildSettingsItem(
-                  Icons.notifications_outlined,
-                  '알림 설정',
-                  Icons.chevron_right,
-                  () {
-                    // TODO: Implement notification settings
-                  },
-                ),
-                const Divider(height: 1),
-                _buildSettingsItem(
-                  Icons.lock_outline,
-                  '보안',
-                  Icons.chevron_right,
-                  () {
-                    // TODO: Implement security settings
-                  },
-                ),
-                const Divider(height: 1),
-                _buildSettingsItem(
-                  Icons.help_outline,
-                  '도움말',
-                  Icons.chevron_right,
-                  () {
-                    // TODO: Implement help
-                  },
-                ),
-                const Divider(height: 1),
-                _buildSettingsItem(
-                  Icons.info_outline,
-                  '앱 정보',
-                  Icons.chevron_right,
-                  () {
-                    // TODO: Implement app info
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement logout
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('로그아웃'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSettingsItem(
-    IconData leadingIcon,
+  Widget _buildSection(
+    BuildContext context,
     String title,
+    List<Widget> children,
+  ) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: AppSpacing.sm),
+          child: Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              color: colorScheme.onBackground,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Card(
+          elevation: 0,
+          color: colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+            side: BorderSide(
+              color: colorScheme.outline.withOpacity(0.2),
+            ),
+          ),
+          child: Column(
+            children: children,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMenuItem(
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData leadingIcon,
     IconData trailingIcon,
     VoidCallback onTap,
   ) {
-    return ListTile(
-      leading: Icon(leadingIcon, color: AppTheme.primaryColor),
-      title: Text(title),
-      trailing: Icon(trailingIcon, color: AppTheme.secondaryColor),
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                leadingIcon,
+                color: colorScheme.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              trailingIcon,
+              color: colorScheme.onSurfaceVariant,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
     );
   }
 } 

@@ -22,13 +22,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: const Text('일정 관리'),
+        title: Text('일정 관리', style: textTheme.headlineLarge),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: Icon(
+              Icons.filter_list,
+              color: colorScheme.onSurface,
+            ),
             onPressed: () {
               // TODO: Implement schedule filter
             },
@@ -37,9 +44,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ),
       body: Column(
         children: [
-          _buildCalendar(),
+          _buildCalendar(context),
           Expanded(
-            child: _buildScheduleList(),
+            child: _buildScheduleList(context),
           ),
         ],
       ),
@@ -47,14 +54,27 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         onPressed: () {
           // TODO: Implement add schedule
         },
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(AppSpacing.md),
+      elevation: 0,
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
       child: TableCalendar(
         firstDay: DateTime.utc(2024, 1, 1),
         lastDay: DateTime.utc(2025, 12, 31),
@@ -76,43 +96,72 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         },
         calendarStyle: CalendarStyle(
           selectedDecoration: BoxDecoration(
-            color: AppTheme.primaryColor,
+            color: colorScheme.primary,
             shape: BoxShape.circle,
           ),
           todayDecoration: BoxDecoration(
-            color: AppTheme.accentColor.withOpacity(0.5),
+            color: colorScheme.primaryContainer,
             shape: BoxShape.circle,
           ),
           markerDecoration: BoxDecoration(
-            color: AppTheme.accentColor,
+            color: colorScheme.tertiary,
             shape: BoxShape.circle,
           ),
+          defaultTextStyle: textTheme.bodyMedium!.copyWith(
+            color: colorScheme.onSurface,
+          ),
+          weekendTextStyle: textTheme.bodyMedium!.copyWith(
+            color: colorScheme.error,
+          ),
+          outsideTextStyle: textTheme.bodyMedium!.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
-        headerStyle: const HeaderStyle(
+        headerStyle: HeaderStyle(
           formatButtonVisible: true,
           titleCentered: true,
+          titleTextStyle: textTheme.titleLarge!.copyWith(
+            color: colorScheme.onSurface,
+          ),
+          formatButtonTextStyle: textTheme.labelLarge!.copyWith(
+            color: colorScheme.primary,
+          ),
+          leftChevronIcon: Icon(
+            Icons.chevron_left,
+            color: colorScheme.primary,
+          ),
+          rightChevronIcon: Icon(
+            Icons.chevron_right,
+            color: colorScheme.primary,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildScheduleList() {
+  Widget _buildScheduleList(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       children: [
         _buildScheduleItem(
+          context,
           '팀 미팅',
           '10:00 - 11:00',
           '회의',
           Icons.groups_outlined,
         ),
         _buildScheduleItem(
+          context,
           '점심 약속',
           '12:30 - 13:30',
           '외부',
           Icons.restaurant_outlined,
         ),
         _buildScheduleItem(
+          context,
           '프로젝트 마감',
           '17:00 - 18:00',
           '업무',
@@ -123,34 +172,66 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Widget _buildScheduleItem(
+    BuildContext context,
     String title,
     String time,
     String category,
     IconData icon,
   ) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 8.0),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      elevation: 0,
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-          child: Icon(icon, color: AppTheme.primaryColor),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Icon(
+            icon,
+            color: colorScheme.primary,
+            size: 20,
+          ),
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
+          style: textTheme.titleMedium?.copyWith(
+            color: colorScheme.onSurface,
           ),
         ),
-        subtitle: Text(time),
-        trailing: Chip(
-          label: Text(
+        subtitle: Text(
+          time,
+          style: textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+          decoration: BoxDecoration(
+            color: colorScheme.tertiaryContainer,
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+          ),
+          child: Text(
             category,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onTertiaryContainer,
             ),
           ),
-          backgroundColor: AppTheme.accentColor,
         ),
         onTap: () {
           // TODO: Implement schedule detail view

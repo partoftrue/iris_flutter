@@ -21,13 +21,20 @@ class _RecordsScreenState extends State<RecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: const Text('기록 관리'),
+        title: Text('기록 관리', style: textTheme.headlineLarge),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(
+              Icons.search,
+              color: colorScheme.onSurface,
+            ),
             onPressed: () {
               // TODO: Implement search
             },
@@ -36,43 +43,61 @@ class _RecordsScreenState extends State<RecordsScreen> {
       ),
       body: Column(
         children: [
-          _buildCategorySelector(),
+          _buildCategorySelector(context),
           Expanded(
-            child: _buildRecordList(),
+            child: _buildRecordList(context),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddRecordDialog();
+          _showAddRecordDialog(context);
         },
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildCategorySelector() {
+  Widget _buildCategorySelector(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Container(
       height: 50,
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _categories.length,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         itemBuilder: (context, index) {
+          final isSelected = _selectedIndex == index;
           return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: ChoiceChip(
-              label: Text(_categories[index]),
-              selected: _selectedIndex == index,
+              label: Text(
+                _categories[index],
+                style: textTheme.labelLarge?.copyWith(
+                  color: isSelected
+                      ? colorScheme.onPrimary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              selected: isSelected,
               onSelected: (selected) {
                 setState(() {
                   _selectedIndex = index;
                 });
               },
-              selectedColor: AppTheme.primaryColor,
-              labelStyle: TextStyle(
-                color: _selectedIndex == index ? Colors.white : AppTheme.secondaryColor,
+              selectedColor: colorScheme.primary,
+              backgroundColor: colorScheme.surfaceVariant,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
             ),
           );
@@ -81,11 +106,15 @@ class _RecordsScreenState extends State<RecordsScreen> {
     );
   }
 
-  Widget _buildRecordList() {
+  Widget _buildRecordList(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return ListView(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppSpacing.md),
       children: [
         _buildRecordItem(
+          context,
           '프로젝트 회의록',
           '어제',
           '회의',
@@ -93,6 +122,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
           '팀 미팅 내용 및 결정사항',
         ),
         _buildRecordItem(
+          context,
           '일일 업무 보고서',
           '2일 전',
           '업무',
@@ -100,6 +130,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
           '오늘 완료한 작업 목록',
         ),
         _buildRecordItem(
+          context,
           '아이디어 메모',
           '3일 전',
           '메모',
@@ -111,69 +142,94 @@ class _RecordsScreenState extends State<RecordsScreen> {
   }
 
   Widget _buildRecordItem(
+    BuildContext context,
     String title,
     String date,
     String category,
     IconData icon,
     String preview,
   ) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      elevation: 0,
+      color: colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
       child: InkWell(
         onTap: () {
           // TODO: Implement record detail view
         },
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-                    child: Icon(icon, color: AppTheme.primaryColor),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: colorScheme.primary,
+                      size: 20,
+                    ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           date,
-                          style: TextStyle(
-                            color: AppTheme.secondaryColor,
-                            fontSize: 12,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Chip(
-                    label: Text(
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                    ),
+                    child: Text(
                       category,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSecondaryContainer,
                       ),
                     ),
-                    backgroundColor: AppTheme.accentColor,
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 preview,
-                style: TextStyle(
-                  color: AppTheme.secondaryColor,
-                  fontSize: 14,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -185,13 +241,17 @@ class _RecordsScreenState extends State<RecordsScreen> {
     );
   }
 
-  void _showAddRecordDialog() {
+  void _showAddRecordDialog(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
+      backgroundColor: colorScheme.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
+          top: Radius.circular(AppSpacing.cardRadius),
         ),
       ),
       builder: (context) {
@@ -199,61 +259,69 @@ class _RecordsScreenState extends State<RecordsScreen> {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '새 기록 추가',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  style: textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
                 TextField(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: '제목',
-                    border: OutlineInputBorder(),
+                    hintText: '기록의 제목을 입력하세요',
+                    labelStyle: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    hintStyle: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: '카테고리',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _categories
-                      .skip(1)
-                      .map((category) => DropdownMenuItem(
-                            value: category,
-                            child: Text(category),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    // TODO: Implement category selection
-                  },
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
                 TextField(
                   maxLines: 3,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: '내용',
-                    border: OutlineInputBorder(),
+                    hintText: '기록할 내용을 입력하세요',
+                    labelStyle: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    hintStyle: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement save record
-                      Navigator.pop(context);
-                    },
-                    child: const Text('저장'),
-                  ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        '취소',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    FilledButton(
+                      onPressed: () {
+                        // TODO: Implement save record
+                        Navigator.pop(context);
+                      },
+                      child: const Text('저장'),
+                    ),
+                  ],
                 ),
               ],
             ),
